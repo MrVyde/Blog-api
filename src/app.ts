@@ -1,5 +1,6 @@
 import express from "express";
 import path from "node:path";
+import usersRoute from "./routes/auth.route";
 
 const app = express();
 
@@ -11,3 +12,9 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+// Route
+
+app.use("/api/auth", usersRoute);
+
+export default app;
