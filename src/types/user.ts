@@ -1,3 +1,4 @@
+//carry role information/permissions
 export interface UserTokenPayload {
   userId: string;
   role: "USER" | "ADMIN";
