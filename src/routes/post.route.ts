@@ -15,7 +15,7 @@ const router = express.Router();
 
 // public
 router.get("/", getAllPosts);
-router.get("/:id", getPostById);
+
 
 // protected (ADMIN ONLY)
 router.post("/", authenticate, requireRole("ADMIN"), createPost);
@@ -24,5 +24,6 @@ router.delete("/:id", authenticate, requireRole("ADMIN"), deletePost);
 
 // optional (if needed)
 router.get("/me/posts", authenticate, getMyPosts);
+router.get("/:id", getPostById);
 
 export default router;
