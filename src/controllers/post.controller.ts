@@ -4,17 +4,16 @@ import * as postService from "../services/post.service";
 // CREATE POST
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const { title, content, published } = req.body;
+    const { title, content } = req.body;
 
     const post = await postService.createPost({
       title,
       content,
-      published,
       authorId: req.user!.userId,
     });
 
     return res.status(201).json(post);
-  } catch {
+  } catch (err) {
     return res.status(500).json({ message: "Failed to create post" });
   }
 };
