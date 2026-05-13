@@ -1,13 +1,12 @@
-export class NotFoundError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "NotFoundError";
-  }
-}
+export class AppError extends Error {
+  statusCode: number;
+  code: string;
 
-export class ValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ValidationError";
+  constructor(code: string, statusCode: number) {
+    super(code);
+    this.code = code;
+    this.statusCode = statusCode;
+
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
