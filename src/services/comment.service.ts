@@ -1,7 +1,8 @@
 import { prisma } from "../lib/prisma";
-import { NotFoundError, ValidationError } from "../errors/appErrors";
+import sanitizeHtml from "sanitize-html";
+import { AppError } from "../errors/appErrors";
 
-// Create comment (supports anonymous or user)
+// Create comment (supports authenticated + guest users)
 export const createComment = async (data: {
   content: string;
   postId: string;
@@ -11,68 +12,83 @@ export const createComment = async (data: {
 }) => {
   const { content, postId, authorId, name, email } = data;
 
-  // 1. Business rule: must have content
-  if (!content || !content.trim()) {
-    throw new ValidationError("Comment content is required");
-  }
+  // Normalize input
+  const trimmedContent = content?.trim();
+  const trimmedName = name?.trim();
+  const trimmedEmail = email?.trim();
 
-  // 2. Check if post exists (prevents Prisma FK crash)
+  // 1. Business rule: content required
+  if (!trimmedContent) {
+  throw new AppError("INVALID_CONTENT", 400);
+}
+
+  // 2. Guest identity rule
+  // Guests must provide either name or email
+  if (!authorId && !trimmedName && !trimmedEmail) {
+  throw new AppError("ANONYMOUS_IDENTITY_REQUIRED", 400);
+}
+
+  // 3. Ensure post exists
   const post = await prisma.post.findUnique({
     where: { id: postId },
     select: { id: true },
   });
 
   if (!post) {
-    throw new NotFoundError("Post not found");
-  }
-
-  // 3. Identity rule (auth OR guest name required)
-  if (!authorId && (!name || !name.trim())) {
-    throw new ValidationError("Name is required for anonymous comments");
-  }
-
-  //limit comment 1 comment every 12hrs
-   const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
-
-const where: any = {
-  postId,
-  createdAt: {
-    gte: twelveHoursAgo,
-  },
-};
-
-if (authorId) {
-  where.authorId = authorId;
-} else {
-  if (name?.trim()) {
-    where.name = name.trim();
-  }
-
-  if (email?.trim()) {
-    where.email = email.trim();
-  }
+  throw new AppError("POST_NOT_FOUND", 404);
 }
 
-const recentComment = await prisma.comment.findFirst({ where });
+  // 4. Comment cooldown rule (1 comment every 12hrs per post)
+  const twelveHoursAgo = new Date(
+    Date.now() - 12 * 60 * 60 * 1000
+  );
 
-  if (recentComment) {
-    throw new ValidationError(
-      "You can only comment once every 12 hours on this post"
-    );
-  }
-
-  // 4. Optional: normalize data
-  const cleanData = {
-    content: content.trim(),
+  const where: any = {
     postId,
-    authorId: authorId ?? null,
-    name: name?.trim() ?? null,
-    email: email?.trim() ?? null,
+    createdAt: {
+      gte: twelveHoursAgo,
+    },
   };
 
-  // 5. Create comment
+  // Logged-in user cooldown
+  if (authorId) {
+    where.authorId = authorId;
+  } else {
+    // Guest cooldown
+    // Match by email if provided
+    if (trimmedEmail) {
+      where.email = trimmedEmail;
+    }
+    // Otherwise fallback to name
+    else if (trimmedName) {
+      where.name = trimmedName;
+    }
+  }
+
+  const recentComment = await prisma.comment.findFirst({
+    where,
+    select: { id: true },
+  });
+
+ if (recentComment) {
+  throw new AppError("COMMENT_COOLDOWN", 400);
+}
+
+  // 5. Sanitize content
+  const cleanContent = sanitizeHtml(trimmedContent, {
+    allowedTags: [],
+    allowedAttributes: {},
+  });
+
+  // 6. Create comment
   return prisma.comment.create({
-    data: cleanData,
+    data: {
+      content: cleanContent,
+      postId,
+      authorId: authorId ?? null,
+      name: trimmedName ?? null,
+      email: trimmedEmail ?? null,
+    },
   });
 };
 
