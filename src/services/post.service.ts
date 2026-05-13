@@ -5,10 +5,14 @@ export const createPost = async (data: {
   title: string;
   content: string;
   authorId: string;
-  published?: boolean;
 }) => {
   return prisma.post.create({
-    data,
+    data: {
+      title: data.title,
+      content: data.content,
+      authorId: data.authorId,
+      published: false, // backend-controlled rule
+    },
   });
 };
 
@@ -17,8 +21,26 @@ export const getPosts = async (publishedOnly = false) => {
   return prisma.post.findMany({
     where: publishedOnly ? { published: true } : {},
     include: {
-      author: true,
-      comments: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+        },
+      },
+      comments: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              role: true,
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -28,10 +50,24 @@ export const getPostById = async (id: string) => {
   return prisma.post.findUnique({
     where: { id },
     include: {
-      author: true,
+      author: {
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+        },
+      },
       comments: {
         include: {
-          author: true,
+          author: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+              role: true,
+            },
+          },
         },
       },
     },
