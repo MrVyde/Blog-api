@@ -38,13 +38,13 @@ export const optionalAuthenticate = (
   const authHeader = req.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    return next(); // 👈 allow anonymous
+    return next(); //  allow anonymous
   }
 
   const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return next(); // 👈 still allow anonymous
+    return next(); //  still allow anonymous
   }
 
   try {
