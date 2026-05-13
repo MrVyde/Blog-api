@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import * as commentService from "../services/comment.service";
-import { NotFoundError, ValidationError } from "../errors/appErrors";
+
 
 // CREATE COMMENT
-export const createComment = async (req: Request, res: Response) => {
+export const createComment = async (req: Request, res: Response, next: any) => {
   try {
     const { content, postId, name, email } = req.body;
 
@@ -16,27 +16,13 @@ export const createComment = async (req: Request, res: Response) => {
     });
 
     return res.status(201).json(comment);
-  } catch (error: any) {
-    console.error(error.message);
-
-    // Validation errors (bad input / missing required fields)
-    if (error instanceof ValidationError) {
-    return res.status(400).json({ message: error.message });
-    }
-
-    // Resource not found (invalid postId)
-    if (error instanceof NotFoundError) {
-    return res.status(404).json({ message: error.message });
-    }
-
-    return res.status(500).json({
-      message: "Failed to create comment",
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 // GET COMMENTS BY POST
-export const getCommentsByPost = async (req: Request, res: Response) => {
+export const getCommentsByPost = async (req: Request, res: Response, next: any) => {
   try {
     const { postId } = req.params;
 
@@ -47,13 +33,13 @@ export const getCommentsByPost = async (req: Request, res: Response) => {
     const comments = await commentService.getCommentsByPost(postId);
 
     return res.json(comments);
-  } catch {
-    return res.status(500).json({ message: "Failed to fetch comments" });
+  } catch (error) {
+    next(error);
   }
 };
 
 // UPDATE COMMENT
-export const updateComment = async (req: Request, res: Response) => {
+export const updateComment = async (req: Request, res: Response, next: any) => {
   try {
     const { id } = req.params;
 
@@ -67,7 +53,6 @@ export const updateComment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    // ownership check
     if (
       comment.authorId !== req.user?.userId &&
       req.user?.role !== "ADMIN"
@@ -80,13 +65,13 @@ export const updateComment = async (req: Request, res: Response) => {
     });
 
     return res.json(updated);
-  } catch {
-    return res.status(500).json({ message: "Failed to update comment" });
+  } catch (error) {
+    next(error);
   }
 };
 
 // DELETE COMMENT
-export const deleteComment = async (req: Request, res: Response) => {
+export const deleteComment = async (req: Request, res: Response, next: any) => {
   try {
     const { id } = req.params;
 
@@ -100,7 +85,6 @@ export const deleteComment = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Comment not found" });
     }
 
-    // ownership check
     if (
       comment.authorId !== req.user?.userId &&
       req.user?.role !== "ADMIN"
@@ -111,7 +95,7 @@ export const deleteComment = async (req: Request, res: Response) => {
     await commentService.deleteComment(id);
 
     return res.json({ message: "Comment deleted successfully" });
-  } catch {
-    return res.status(500).json({ message: "Failed to delete comment" });
+  } catch (error) {
+    next(error);
   }
 };
