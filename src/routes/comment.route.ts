@@ -2,6 +2,7 @@ import express from "express";
 import {
   createComment,
   getCommentsByPost,
+  getAllComments,
   updateComment,
   deleteComment,
 } from "../controllers/comment.controller";
@@ -15,6 +16,9 @@ import { validate } from "../middleware/validate";
 import { authenticate, optionalAuthenticate } from "../middleware/auth.middleware";
 
 const router = express.Router();
+
+//  Get All Comments
+router.get("/", authenticate, getAllComments);
 
 // PUBLIC (read comments)
 router.get("/post/:postId", postIdParamValidator,  validate, getCommentsByPost);
