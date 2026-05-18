@@ -21,6 +21,29 @@ export const createComment = async (req: Request, res: Response, next: any) => {
   }
 };
 
+// GET ALL COMMENTS
+export const getAllComments = async (
+  req: Request,
+  res: Response,
+  next: any
+) => {
+  try {
+    // optional admin check
+    if (req.user?.role !== "ADMIN") {
+      return res.status(403).json({
+        message: "Access denied",
+      });
+    }
+
+    const comments = await commentService.getAllComments();
+
+    return res.json(comments);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // GET COMMENTS BY POST
 export const getCommentsByPost = async (req: Request, res: Response, next: any) => {
   try {
