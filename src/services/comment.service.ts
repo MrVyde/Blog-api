@@ -103,6 +103,31 @@ export const getCommentsByPost = async (postId: string) => {
   });
 };
 
+export const getAllComments = async () => {
+  return prisma.comment.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 10,
+
+    include: {
+      post: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+
+      author: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+    },
+  });
+};
+
 // Get comment by ID
 export const getCommentById = async (id: string) => {
   return prisma.comment.findUnique({
