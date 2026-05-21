@@ -4,11 +4,12 @@ import * as postService from "../services/post.service";
 // CREATE POST
 export const createPost = async (req: Request, res: Response) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, published } = req.body;
 
     const post = await postService.createPost({
       title,
       content,
+      published,
       authorId: req.user!.userId,
     });
 
@@ -21,13 +22,13 @@ export const createPost = async (req: Request, res: Response) => {
 // GET ALL POSTS
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const isAdmin = req.user?.role === "ADMIN";
-
-    const posts = await postService.getPosts(!isAdmin);
+    const posts = await postService.getPosts(req.user);
 
     return res.json(posts);
-  } catch {
-    return res.status(500).json({ message: "Failed to fetch posts" });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Failed to fetch posts",
+    });
   }
 };
 
@@ -77,7 +78,13 @@ export const updatePost = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    const updatedPost = await postService.updatePost(id, req.body);
+    const { title, content, published } = req.body;
+
+    const updatedPost = await postService.updatePost(id, {
+      title,
+      content,
+      published,
+    });
 
     return res.json(updatedPost);
   } catch {
