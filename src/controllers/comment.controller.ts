@@ -61,6 +61,36 @@ export const getCommentsByPost = async (req: Request, res: Response, next: any) 
   }
 };
 
+
+// GET COMMENT BY ID
+export const getCommentById = async (
+  req: Request,
+  res: Response,
+  next: any
+) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({
+        message: "Invalid comment id",
+      });
+    }
+
+    const comment = await commentService.getCommentById(id);
+
+    if (!comment) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
+
+    return res.json(comment);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // UPDATE COMMENT
 export const updateComment = async (req: Request, res: Response, next: any) => {
   try {
