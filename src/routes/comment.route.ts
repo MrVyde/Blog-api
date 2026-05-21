@@ -3,6 +3,7 @@ import {
   createComment,
   getCommentsByPost,
   getAllComments,
+  getCommentById,
   updateComment,
   deleteComment,
 } from "../controllers/comment.controller";
@@ -22,6 +23,9 @@ router.get("/", authenticate, getAllComments);
 
 // PUBLIC (read comments)
 router.get("/post/:postId", postIdParamValidator,  validate, getCommentsByPost);
+
+// GET COMMENT by id
+router.get("/:id", authenticate, getCommentById);
 
 // CREATE COMMENT (auth optional but allowed)
 router.post("/", optionalAuthenticate, createCommentValidator, validate, createComment);
