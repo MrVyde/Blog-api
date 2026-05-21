@@ -8,18 +8,20 @@ import {
   getMyPosts,
 } from "../controllers/post.controller";
 
-import { authenticate } from "../middleware/auth.middleware";
+import { authenticate, optionalAuthenticate } from "../middleware/auth.middleware";
 import { requireRole } from "../middleware/role.middleware";
+import { createPostValidator, updatePostValidator } from "../middleware/post.validator";
+import { validate } from "../middleware/validate";
 
 const router = express.Router();
 
 // public
-router.get("/", getAllPosts);
+router.get("/",optionalAuthenticate, getAllPosts);
 
 
 // protected (ADMIN ONLY)
-router.post("/", authenticate, requireRole("ADMIN"), createPost);
-router.put("/:id", authenticate, requireRole("ADMIN"), updatePost);
+router.post("/", authenticate, requireRole("ADMIN"), createPostValidator, validate, createPost);
+router.put("/:id", authenticate,  requireRole("ADMIN"),updatePostValidator, validate, updatePost);
 router.delete("/:id", authenticate, requireRole("ADMIN"), deletePost);
 
 // optional (if needed)
