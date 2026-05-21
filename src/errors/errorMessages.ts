@@ -24,4 +24,24 @@ export const errorMessages: Record<string, string> = {
 
   COMMENT_COOLDOWN:
     "You can only comment once every 12 hours on this post",
+
+  TITLE_IS_REQUIRED:
+    "Title is required",
+
+  TITLE_MUST_BE_3_200_CHARACTERS:
+    "Title must be 3–200 characters",
+
+  CONTENT_IS_REQUIRED:
+    "Content is required",
+
+  CONTENT_MUST_BE_AT_LEAST_10_CHARACTERS:
+    "Content must be at least 10 characters",
+
+  PUBLISHED_MUST_BE_BOOLEAN:
+    "Published must be true or false",
+
+  PUBLISHED_MUST_BE_TRUE_OR_FALSE:
+  "Published must be true or false",
+
+
 };
