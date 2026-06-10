@@ -4,8 +4,10 @@ import bcrypt from "bcrypt";
 async function main() {
   const hashedPassword = await bcrypt.hash("admin123", 10);
 
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { username: "admin" },
+    update: {},
+    create: {
       email: "admin@test.com",
       username: "admin",
       password: hashedPassword,
@@ -13,7 +15,7 @@ async function main() {
     },
   });
 
-  console.log("Admin user created");
+  console.log("Admin user created or already exists");
 }
 
 main()
