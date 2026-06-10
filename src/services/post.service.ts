@@ -5,21 +5,27 @@ export const createPost = async (data: {
   title: string;
   content: string;
   authorId: string;
+  published?: boolean;
 }) => {
   return prisma.post.create({
     data: {
       title: data.title,
       content: data.content,
       authorId: data.authorId,
-      published: false, // backend-controlled rule
+      published: data.published ?? false, // backend-controlled rule
     },
   });
 };
 
 // Get all posts
-export const getPosts = async (publishedOnly = false) => {
+export const getPosts = async (
+  user?: { role?: string }
+) => {
+  const isAdmin = user?.role === "ADMIN";
+
   return prisma.post.findMany({
-    where: publishedOnly ? { published: true } : {},
+    where: isAdmin ? {} : { published: true },
+
     include: {
       author: {
         select: {
@@ -41,6 +47,9 @@ export const getPosts = async (publishedOnly = false) => {
           },
         },
       },
+    },
+    orderBy: {
+      createdAt: "desc",
     },
   });
 };
