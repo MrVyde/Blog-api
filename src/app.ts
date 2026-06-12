@@ -20,7 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 // Route
 app.use(
   cors({
-    origin: ["https://blog-admin-pearl-zeta.vercel.app/", "http://localhost:5000"],
+    origin: ["https://blog-admin-pearl-zeta.vercel.app",
+      "http://localhost:3000",
+      "http://localhost:5000"],
     credentials: true,
   })
 );
