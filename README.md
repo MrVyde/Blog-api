@@ -1,57 +1,173 @@
 # Blog API
 
-A backend-only project for managing blog posts and comments, built with **Node.js**, **Express**, and **Prisma ORM**.  
-The API supports JWT authentication and provides endpoints for creating, editing, publishing, and commenting on blog posts.
+A REST API built with Node.js, Express, and Prisma ORM that powers a full-stack blogging platform consisting of a public blog frontend and an admin dashboard.
 
----
+## Live API
 
-##  Deployment
-Live API: [https://blog-api-k0tb.onrender.com](https://blog-api-k0tb.onrender.com)
+https://blog-api-k0tb.onrender.com
 
----
+## Project Ecosystem
 
-##  Tech Stack
-- Node.js  
-- Express  
-- Prisma ORM  
-- JWT Authentication  
-
----
-
-##  Installation &  Usage
-git clone https://github.com/your-username/blog_api.git
-cd blog_api
-npm install
-npm run dev
-
-The API will be available at http://localhost:3000.
-
-## Authentication
-
-JWT-based authentication is required for protected routes.Attach token in requests via:
-
-Authorization: Bearer <token>
+```text
+Blog Platform
+├── Blog Frontend (Public Site)
+├── Blog Admin (Content Management)
+└── Blog API (Backend)
+```
 
 ## Features
 
-Create, edit, publish/unpublish blog posts
+* JWT-based authentication
+* Protected admin routes and authorization
+* Create, edit, publish, and unpublish blog posts
+* Comment management system
+* Public comment submission with rate limiting
+* Input validation using express-validator
+* Centralized error handling middleware
+* CORS configuration for multiple frontend clients
+* Prisma ORM database integration with Supabase
 
-Add and manage comments
+## Tech Stack
 
-User model for authors and readers
+* Node.js
+* Express
+* TypeScript
+* Prisma ORM
+* Supabase (PostgreSQL)
+* JWT Authentication
+* express-validator
+* REST API
 
-Protected routes for post management
+## Architecture
 
-## Endpoints
+The API serves as the central backend for both frontend applications.
 
-POST /auth/login – Authenticate user and receive JWT
+* Deployed on Render
+* Database hosted on Supabase
+* Prisma ORM for database access
+* JWT authentication for admin access
+* Middleware-based architecture for validation, authentication, and error handling
+* CORS configuration for multiple frontend clients
 
-GET /posts – Fetch all published posts
+### Connected Applications
 
-POST /posts – Create new post (auth required)
+* Public Blog Frontend
+  https://github.com/MrVyde/Blog-frontend
 
-PUT /posts/:id – Edit or publish/unpublish post (auth required)
+* Admin Dashboard
+  https://github.com/MrVyde/Blog-admin
 
-DELETE /comments/:id – Manage comments (auth required)
+The API handles authentication, content management, comment moderation, validation, and communication between deployed frontend applications.
 
-(Full endpoint documentation can be added here if required.)
+## Security & Middleware
+
+* JWT authentication for protected routes
+* Input validation using express-validator (posts, comments, auth)
+* Rate limiting on comment submissions to prevent spam
+* Centralized error handling middleware
+* CORS restricted to trusted frontend domains
+* Environment variables for sensitive configuration
+
+## What This Project Demonstrates
+
+* REST API design and architecture
+* JWT authentication and authorization
+* Middleware-driven backend structure
+* Input validation using express-validator
+* Rate limiting and abuse prevention
+* Prisma ORM with Supabase (PostgreSQL)
+* Secure environment variable management
+* Cross-origin communication (CORS)
+* Error handling and clean API responses
+* Full-stack system design (Frontend + Admin + API)
+
+## Authentication
+
+Protected routes require a valid JWT.
+
+```http 
+Authorization: Bearer <token>
+```
+
+## Key Endpoints
+
+### Authentication
+
+```http 
+POST /api/auth/login
+```
+
+Authenticate an admin user and receive a JWT.
+
+### Posts
+
+```http 
+GET /api/posts
+POST /api/posts
+PUT /api/posts/:id
+DELETE /api/posts/:id
+```
+
+Manage blog posts and publication status.
+
+### Comments
+
+```http 
+GET /api/comments
+POST /api/comments
+DELETE /api/comments/:id
+```
+
+Create and manage comments.
+
+## Environment Variables
+
+```env 
+DATABASE_URL=
+JWT_SECRET=
+PORT=
+```
+
+## Local Setup
+
+Clone the repository:
+
+```bash 
+git clone https://github.com/MrVyde/Blog-api.git
+cd Blog-api
+```
+
+Install dependencies:
+
+```bash 
+npm install
+```
+
+Create environment variables:
+
+```env 
+DATABASE_URL=
+JWT_SECRET=
+PORT=3000
+```
+
+Run the development server:
+
+```bash 
+npm run dev
+```
+
+The API will be available at:
+
+```text 
+http://localhost:3000
+```
+
+## Related Projects
+
+* Frontend: https://github.com/MrVyde/Blog-frontend
+* Admin Dashboard: https://github.com/MrVyde/Blog-admin
+
+## Repository
+
+https://github.com/MrVyde/Blog-api
